@@ -5,7 +5,6 @@
 #include "chesser.tab.h"
 
 int line = 1;
-char moves[1024] = "";
 %}
 
 NEW_LINE      [\n\r]
@@ -67,11 +66,6 @@ CHECKMATE     [#]
 
 [ \t]+ { 
     printf("Espacio o tabulación ignorada\n"); 
-}
-
-. { 
-    fprintf(stderr, "Notación incorrecta: '%s' en la línea %d\n", yytext, line); 
-    return ERROR; 
 }
 
 %%

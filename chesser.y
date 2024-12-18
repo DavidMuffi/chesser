@@ -7,11 +7,14 @@ extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
 extern int line;
-extern char moves[1024];
+
+char *moves[10];
+int num_movimientos = 0;
 
 typedef struct {
     char nombre[50];
-    char movimientos[1024];
+    char *movimientos[10];
+    int num_movimientos;
 } Apertura;
 
 Apertura aperturas[100];
@@ -26,58 +29,166 @@ void cargar_aperturas(const char *filename) {
 
     char buffer[1024];
     while (fgets(buffer, sizeof(buffer), file)) {
-        char *movimientos = strtok(buffer, "= ");
-        char *nombre = strtok(NULL, "\n");
+        char *movimientos = strtok(buffer, "=");
+        char *nombre = strtok(NULL, "=");
+
         if (nombre && movimientos) {
+            // Limpiar y almacenar el nombre de la apertura
             strcpy(aperturas[num_aperturas].nombre, nombre);
-            strcpy(aperturas[num_aperturas].movimientos, movimientos);
+            aperturas[num_aperturas].num_movimientos = 0;
+
+            // Dividir y almacenar los movimientos
+            char *token = strtok(movimientos, " ");
+            while (token) {
+                aperturas[num_aperturas].movimientos[aperturas[num_aperturas].num_movimientos++] = strdup(token);
+                token = strtok(NULL, " ");
+            }
             num_aperturas++;
         }
     }
-
     fclose(file);
 }
 
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s en la línea %d\n", s, line);
 }
-
 %}
+
 %error-verbose
 %union {
     char *str;
 }
 
-%token <str> PIECE COORD CAPTURE CASTLE_SHORT CASTLE_LONG CHECK CHECKMATE ERROR
-%type <str> line movs mov
+%token <str> PIECE COORD CAPTURE CASTLE_SHORT CASTLE_LONG CHECK CHECKMATE
+%type <str> movs mov
 
 %%
 
 input:
-    | input line
-    ;
+    | input movs {
+        char *apertura_reconocida = NULL;
+        int max_movimientos_coincidentes = 0;
 
-line:
-    movs '\n' { free($1); }
-    ;
+        for (int i = 0; i < num_aperturas; i++) {
+            int movimientos_a_comparar = aperturas[i].num_movimientos;
 
+            // Verificar coincidencia de movimientos
+            if (num_movimientos >= movimientos_a_comparar) {
+                int coincide = 1;
+                for (int j = 0; j < movimientos_a_comparar; j++) {
+                    if (strcmp(moves[j], aperturas[i].movimientos[j]) != 0) {
+                        coincide = 0;
+                        break;
+                    }
+                }
+
+                // Actualizar la apertura más larga reconocida
+                if (coincide && movimientos_a_comparar > max_movimientos_coincidentes) {
+                    max_movimientos_coincidentes = movimientos_a_comparar;
+                    apertura_reconocida = aperturas[i].nombre;
+                }
+            }
+        }
+
+        if (apertura_reconocida) {
+            printf("Apertura reconocida: %s\n", apertura_reconocida);
+        } else {
+            printf("Apertura desconocida\n");
+        }
+    }
+    ;
 movs:
-    mov { strcat(moves, $1); strcat(moves, " "); $$ = $1; }
-    | movs mov { strcat(moves, $2); strcat(moves, " "); $$ = $2; }
+    mov {
+        moves[num_movimientos++] = $1; // Agrega el primer movimiento al array
+    }
+    | movs mov {
+        moves[num_movimientos++] = $2; // Agrega más movimientos al array
+    }
     ;
 
 mov:
-    PIECE COORD { $$ = malloc(strlen($1) + strlen($2) + 1); strcpy($$, $1); strcat($$, $2); free($1); free($2); }
-    | COORD { $$ = strdup($1); free($1); }
-    | COORD CAPTURE COORD { $$ = malloc(strlen($1) + strlen($2) + strlen($3) + 1); strcpy($$, $1); strcat($$, $2); strcat($$, $3); free($1); free($2); free($3); }
-    | CASTLE_SHORT { $$ = strdup($1); free($1); }
-    | CASTLE_LONG { $$ = strdup($1); free($1); }
-    | COORD CHECK { $$ = malloc(strlen($1) + strlen($2) + 1); strcpy($$, $1); strcat($$, $2); free($1); free($2); }
-    | COORD CHECKMATE { $$ = malloc(strlen($1) + strlen($2) + 1); strcpy($$, $1); strcat($$, $2); free($1); free($2); }
-    | PIECE COORD CHECK { $$ = malloc(strlen($1) + strlen($2) + strlen($3) + 1); strcpy($$, $1); strcat($$, $2); strcat($$, $3); free($1); free($2); free($3); }
-    | PIECE COORD CHECKMATE { $$ = malloc(strlen($1) + strlen($2) + strlen($3) + 1); strcpy($$, $1); strcat($$, $2); strcat($$, $3); free($1); free($2); free($3); }
-    | COORD CAPTURE COORD CHECK { $$ = malloc(strlen($1) + strlen($2) + strlen($3) + strlen($4) + 1); strcpy($$, $1); strcat($$, $2); strcat($$, $3); strcat($$, $4); free($1); free($2); free($3); free($4); }
-    | COORD CAPTURE COORD CHECKMATE { $$ = malloc(strlen($1) + strlen($2) + strlen($3) + strlen($4) + 1); strcpy($$, $1); strcat($$, $2); strcat($$, $3); strcat($$, $4); free($1); free($2); free($3); free($4); }
+    PIECE COORD {
+        $$ = malloc(strlen($1) + strlen($2) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        free($1);
+        free($2);
+    }
+    | COORD {
+        $$ = strdup($1);
+        free($1);
+    }
+    | COORD CAPTURE COORD {
+        $$ = malloc(strlen($1) + strlen($2) + strlen($3) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        strcat($$, $3);
+        free($1);
+        free($2);
+        free($3);
+    }
+    | CASTLE_SHORT {
+        $$ = strdup($1);
+        free($1);
+    }
+    | CASTLE_LONG {
+        $$ = strdup($1);
+        free($1);
+    }
+    | COORD CHECK {
+        $$ = malloc(strlen($1) + strlen($2) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        free($1);
+        free($2);
+    }
+    | COORD CHECKMATE {
+        $$ = malloc(strlen($1) + strlen($2) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        free($1);
+        free($2);
+    }
+    | PIECE COORD CHECK {
+        $$ = malloc(strlen($1) + strlen($2) + strlen($3) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        strcat($$, $3);
+        free($1);
+        free($2);
+        free($3);
+    }
+    | PIECE COORD CHECKMATE {
+        $$ = malloc(strlen($1) + strlen($2) + strlen($3) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        strcat($$, $3);
+        free($1);
+        free($2);
+        free($3);
+    }
+    | COORD CAPTURE COORD CHECK {
+        $$ = malloc(strlen($1) + strlen($2) + strlen($3) + strlen($4) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        strcat($$, $3);
+        strcat($$, $4);
+        free($1);
+        free($2);
+        free($3);
+        free($4);
+    }
+    | COORD CAPTURE COORD CHECKMATE {
+        $$ = malloc(strlen($1) + strlen($2) + strlen($3) + strlen($4) + 1);
+        strcpy($$, $1);
+        strcat($$, $2);
+        strcat($$, $3);
+        strcat($$, $4);
+        free($1);
+        free($2);
+        free($3);
+        free($4);
+    }
     ;
 
 %%
@@ -92,17 +203,11 @@ int main(int argc, char **argv) {
         yyin = file;
     }
 
+    // Cargar aperturas desde el archivo
     cargar_aperturas("aperturas.txt");
 
+    // Parsear el archivo de entrada
     yyparse();
 
-    for (int i = 0; i < num_aperturas; i++) {
-        if (strcmp(moves, aperturas[i].movimientos) == 0) {
-            printf("%s %s\n", moves, aperturas[i].nombre);
-            return 0;
-        }
-    }
-
-    printf("%sApertura desconocida\n", moves);
     return 0;
 }
