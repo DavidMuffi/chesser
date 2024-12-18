@@ -1,0 +1,9 @@
+e4 e5 Nf3 Nc6 Bb5 a6 = Ruy López
+e4 e5 Nf3 d6 d4 exd4 Nxd4 Nf6 Nc3 Be7 = Defensa Philidor
+e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nc3 Bb4 = Apertura Española
+e4 e5 Nf3 Nc6 Bb5 Nf6 = Defensa Berlinesa
+e4 e5 Nf3 Nc6 Bb5 d6 = Defensa Steinitz
+e4 e5 Nf3 Nc6 Bb5 f5 = Defensa Schliemann
+e4 e5 Nf3 Nc6 Bb5 g6 = Defensa Cozio
+e4 e5 Nf3 Nc6 Bb5 Nge7 = Defensa Cozio
+e4 e5 Nf3 Nc6 Bb5 Nd4 = Defensa Bird

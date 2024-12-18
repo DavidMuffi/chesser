@@ -1,0 +1,31 @@
+Autor: David Muíños Figueroa
+
+Desarrollo:
+Para mi parser simple de código XMLhe tomado las siguientes decisiones.
+El analizador léxico lleva el contador de líneas para identificar los errores en el archivo de entrada.
+Los comentarios se descartan en el analizador léxico porque carecen de sentido semántico.
+Durante el desarrollo me propuse detectar si los parámetros de la cabecera eran correctos pero no fui capaz,
+entonces la detección de cabeceras da por válida cualquier cabecera del tipo: <?xml c_u4lquier-c0sa?>.
+En cuanto a las etiquetas las he separado en el analizador léxico de la siguiente manera:
+<
+NOMBRE
+>
+</
+NOMBRE
+>
+Fue una decisión que tomé en un inicio pensando que luego en BISON me vendría bien para detectar el nombre
+del TAG al abrirla y cerrarla (detectando posibles cambios en el nombre como en el archivo practica2_ejemplo2.xml)
+el token CONTENT es todo lo que no sea <, >, un salto de línea o un & (que no puede usarse en XML si no es una
+referencia correcta). Un salto de línea se suma al contador line declarado externo en el archivo del analizador
+sintáctico en BISON.
+En cuanto al analizador sintáctico el documento debe empezar con la cabecera seguida de full_element, que se refiere
+al contenido del XML, puede ser vacío o ser un element, es decir una etiqueta, que debe abrirse y cerrarse con el mismo
+nombre e incluir texto normal (content) o otras etiquetas recursivamente.
+utilizo varias veces la funcion free() para liberar el espacio en tokens y utilizando $X siendo X un numero de los
+parametros puedo por ejemplo comprobar entre las líneas 28 y 38 si se abre ($2) y cierra ($6) con el mismo tag_name
+
+
+Ejecución:
+make compile
+make run1 (ejecuta practica2_ejemplo1.xml)
+make run2 (ejecuta practica2_ejemplo2.xml)
