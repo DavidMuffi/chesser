@@ -1,9 +1,7 @@
 b3 = Nimzowitsch-Larsen Attack
-
 c4 = English Opening
 c4 c5 = English Opening: Symmetrical Variation
 c4 e5 = English Opening: King's English Variation
-
 d4 = Queen's Pawn Opening
 d4 f5 = Dutch Defense
 d4 g6 = Modern Defense with d4
@@ -27,8 +25,27 @@ d4 Nf6 c4 g6 Nc3 d5 = Grünfeld Defense
 d4 Nf6 c4 c5 d5 e6 = Benoni Defense: Modern Variation
 d4 Nf6 c4 c5 d5 b5 = Benko Gambit
 d4 Nf6 c4 e6 Nf3 b6 = Queen's Indian Defense
-
-
+d4 Nf6 c4 e6 Nf3 Bb4+ = Bogo-Indian Defense
+d4 d5 c4 e6 Nf3 c5 = Queen's Gambit Declined: Pseudo-Tarrasch Defense
+d4 Nf6 c4 e6 g3 d5 Bg2 = Catalan Opening: Closed
+d4 Nf6 c4 g6 Nc3 d5 Bg5 = Grünfeld Defense: Stockholm Variation
+d4 Nf6 c4 g6 Nc3 d5 Nf3 = Grünfeld Defense: Three Knights Variation
+d4 Nf6 c4 g6 Nc3 d5 Bf4 = Grünfeld Defense: Brinckmann Attack
+d4 d5 c4 e6 Nc3 Nf6 Nf3 c5 = Queen's Gambit Declined: Three Knights, Semi-Tarrasch Defense
+d4 d5 c4 e6 Nc3 Nf6 Nf3 c6 = Semi-Slav Defense
+d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 = Grünfeld Defense: Exchange Variation
+d4 Nf6 c4 e6 Nc3 Bb4 e3 c5 = Nimzo Indian Defense: Hübner Variation
+d4 Nf6 c4 g6 Nc3 Bg7 Nf3 d6 g3 = King's Indian Defense: Normal, Fianchetto Variation
+d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 = King's Indian Defense: Four Pawns Attack
+d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 = King's Indian Defense: Sämisch Variation
+d4 f5 c4 Nf6 g3 g6 Bg2 Bg7 Nf3 = English Opening: Anglo-Dutch Defense
+d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3 = Nimzo-Indian Defense: Sämisch Variation
+d4 Nf6 c4 e6 Nc3 Bb4 e3 c5 Ne2 = Nimzo-Indian Defense: Hübner, Rubinstein Variation
+d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 = King's Indian Defense: Orthodox Variation
+d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5 = King's Indian Defense: Averbakh Variation
+d4 d5 c4 e6 Nc3 Nf6 Nf3 Be7 Bg5 O-O = Queen's Gambit Declined: Orthodox Defense
+d4 f5 g3 Nf6 Bg2 e6 Nf3 d5 O-O Bd6 c4 c6 = Dutch Defense: Fianchetto, Ilyin-Zhenevsky, Stonewall Variation
+d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 b4 = King's Indian Defense: Bayonet Attack
 e4 = King's Pawn Opening
 e4 d6 = Pirk Defense
 e4 c6 = Caro-Kann Defense
@@ -67,10 +84,31 @@ e4 e6 d4 d5 Nc3 Nf6 = French Defense: Classical Variation
 e4 e5 f4 exf4 Nf3 d5 = King's Gambit Accepted: Modern Defense
 e4 e5 Nf3 Nc6 Bb5 f5 = Ruy López Opening: Jaenisch Gambit
 e4 g6 d4 Bg7 Nc3 c5 = Modern Defense: Standard Pterodactyl Defense
-
+e4 e6 d4 d5 Nc3 dxe4 = French Defense: Rubinstein Variation
+e4 e5 Nf3 Nc6 Bb5 d6 = Ruy López Opening: Old Steinitz Defense
+e4 e5 Nf3 Nc6 Bb5 Bc5 = Ruy López Opening: Classical Defense
+e4 e5 Nf3 Nc6 Bc4 Be7 = Italian Game: Hungarian Defense
+e4 e5 Nf3 Bc4 Bc5 b4 = Giuco Piano Game: Evans Gambit
+e4 c6 d4 d5 exd5 c4 = Caro-Kann Defense: Panov Attack
+e4 e5 Nf3 Nc6 Nc3 Nf6 d4 = Four Knights Game: Scotch Variation
+e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 = Ruy López Opening: Morphy Defense, Exchange Variation
+e4 d6 d4 Nf6 Nc3 g6 Nf3 = Pirc Defense: Classical Variation
+e4 d6 d4 Nf6 Nc3 g6 f4 = Pirc Defense: Main Line, Austrian Attack
+d4 Nf6 c4 e6 Nc3 Bb4 Qc2 = Nimzo Indian Defense: Classical Variation
+e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 = Sicilian Defense: Old Sicilian, Open, Accelerated Dragon Variation
+e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 = Caro-Kann Defense: Classical Variation
+e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 = Scotch Game: Classical Variation
+e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 = Sicilian Defense: Taimanov Variation
+e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 = Sicilian Defense: Kan Variation
+e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4 = French Defense: Classical, Burn Variation
+e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4 = Scotch Game: Steinitz Variation
+e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 = Petrov's Defense: Classical Attack
+e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 = Sicilian Defense: Open Dragon Variation
+e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 = Sicilian Defense: Open, Najdorf Variation
+e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6 = Sicilian Defense: Open, Scheveningen Variation
+e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5 = Sicilian Defense: Open, Classical, Richter-Rauzer Variation
+e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nc3 Bb4 = Scotch Game: Schmidth, Mieses Variation
 f4 = Bird's Opening
-
 g3 = King's Fianchetto Opening
-
 Nf3 = Réti Opening
 Nf3 d5 c4 = Réti Opening: Réti Gambit
