@@ -122,6 +122,16 @@ input:
 
         if (apertura_reconocida) {
             printf("Apertura reconocida: %s.\n", apertura_reconocida);
+
+            char command[256];
+            sprintf(command, "python3 chesser.py \"%s\"", apertura_reconocida);
+            int result = system(command);
+
+            if (result == 0) {
+                printf("El script Python se ejecutó con éxito.\n");
+            } else {
+                printf("Error al ejecutar el script Python.\n");
+            }
         } else if(!validar_movimientos(moves, num_movimientos)) {
             printf("Apertura ilegal. Un jugador no puede enrocar varias veces por partida.\n");
         } else {
