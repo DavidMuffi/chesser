@@ -78,16 +78,16 @@ extern int yyparse();
 extern FILE *yyin;
 extern int line;
 
-char *moves[10];
+char *moves[50];
 int num_movimientos = 0;
 
 typedef struct {
-    char nombre[50];
-    char *movimientos[10];
+    char nombre[100];
+    char *movimientos[20];
     int num_movimientos;
 } Apertura;
 
-Apertura aperturas[100];
+Apertura aperturas[200];
 int num_aperturas = 0;
 
 void cargar_aperturas(const char *filename) {
@@ -99,31 +99,49 @@ void cargar_aperturas(const char *filename) {
 
     char buffer[1024];
     while (fgets(buffer, sizeof(buffer), file)) {
+        // Eliminar el carácter de nueva línea si existe
+        char *newline = strchr(buffer, '\n');
+        if (newline) {
+            *newline = '\0';
+        }
+
+        // Dividir en movimientos y nombre
         char *movimientos = strtok(buffer, "=");
         char *nombre = strtok(NULL, "=");
 
         if (nombre && movimientos) {
+            // Eliminar espacios iniciales/finales del nombre
+            while (*nombre == ' ') nombre++; // Saltar espacios al inicio
+            char *end = nombre + strlen(nombre) - 1;
+            while (end > nombre && *end == ' ') end--; // Saltar espacios al final
+            *(end + 1) = '\0'; // Terminar la cadena
+
             // Limpiar y almacenar el nombre de la apertura
-            strcpy(aperturas[num_aperturas].nombre, nombre);
+            strncpy(aperturas[num_aperturas].nombre, nombre, sizeof(aperturas[num_aperturas].nombre) - 1);
+            aperturas[num_aperturas].nombre[sizeof(aperturas[num_aperturas].nombre) - 1] = '\0';
             aperturas[num_aperturas].num_movimientos = 0;
 
             // Dividir y almacenar los movimientos
             char *token = strtok(movimientos, " ");
-            while (token) {
-                aperturas[num_aperturas].movimientos[aperturas[num_aperturas].num_movimientos++] = strdup(token);
+            while (token && aperturas[num_aperturas].num_movimientos < 10) {
+                aperturas[num_aperturas].movimientos[aperturas[num_aperturas].num_movimientos] = strdup(token);
+                aperturas[num_aperturas].num_movimientos++;
                 token = strtok(NULL, " ");
             }
+
             num_aperturas++;
         }
     }
+
     fclose(file);
 }
+
 
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s en la línea %d\n", s, line);
 }
 
-#line 127 "chesser.tab.c"
+#line 145 "chesser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -551,8 +569,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    67,    67,    68,   101,   104,   110,   117,   121,   130,
-     134,   138,   145,   152,   161,   170,   181
+       0,    85,    85,    86,   119,   122,   128,   135,   139,   148,
+     152,   156,   163,   170,   179,   188,   199
 };
 #endif
 
@@ -1387,7 +1405,7 @@ yyreduce:
   switch (yyn)
     {
   case 3: /* input: input movs  */
-#line 68 "chesser.y"
+#line 86 "chesser.y"
                  {
         char *apertura_reconocida = NULL;
         int max_movimientos_coincidentes = 0;
@@ -1419,27 +1437,27 @@ yyreduce:
             printf("Apertura desconocida\n");
         }
     }
-#line 1423 "chesser.tab.c"
+#line 1441 "chesser.tab.c"
     break;
 
   case 4: /* movs: mov  */
-#line 101 "chesser.y"
+#line 119 "chesser.y"
         {
         moves[num_movimientos++] = (yyvsp[0].str); // Agrega el primer movimiento al array
     }
-#line 1431 "chesser.tab.c"
+#line 1449 "chesser.tab.c"
     break;
 
   case 5: /* movs: movs mov  */
-#line 104 "chesser.y"
+#line 122 "chesser.y"
                {
         moves[num_movimientos++] = (yyvsp[0].str); // Agrega más movimientos al array
     }
-#line 1439 "chesser.tab.c"
+#line 1457 "chesser.tab.c"
     break;
 
   case 6: /* mov: PIECE COORD  */
-#line 110 "chesser.y"
+#line 128 "chesser.y"
                 {
         (yyval.str) = malloc(strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-1].str));
@@ -1447,20 +1465,20 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1451 "chesser.tab.c"
+#line 1469 "chesser.tab.c"
     break;
 
   case 7: /* mov: COORD  */
-#line 117 "chesser.y"
+#line 135 "chesser.y"
             {
         (yyval.str) = strdup((yyvsp[0].str));
         free((yyvsp[0].str));
     }
-#line 1460 "chesser.tab.c"
+#line 1478 "chesser.tab.c"
     break;
 
   case 8: /* mov: COORD CAPTURE COORD  */
-#line 121 "chesser.y"
+#line 139 "chesser.y"
                           {
         (yyval.str) = malloc(strlen((yyvsp[-2].str)) + strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-2].str));
@@ -1470,29 +1488,29 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1474 "chesser.tab.c"
+#line 1492 "chesser.tab.c"
     break;
 
   case 9: /* mov: CASTLE_SHORT  */
-#line 130 "chesser.y"
+#line 148 "chesser.y"
                    {
         (yyval.str) = strdup((yyvsp[0].str));
         free((yyvsp[0].str));
     }
-#line 1483 "chesser.tab.c"
+#line 1501 "chesser.tab.c"
     break;
 
   case 10: /* mov: CASTLE_LONG  */
-#line 134 "chesser.y"
+#line 152 "chesser.y"
                   {
         (yyval.str) = strdup((yyvsp[0].str));
         free((yyvsp[0].str));
     }
-#line 1492 "chesser.tab.c"
+#line 1510 "chesser.tab.c"
     break;
 
   case 11: /* mov: COORD CHECK  */
-#line 138 "chesser.y"
+#line 156 "chesser.y"
                   {
         (yyval.str) = malloc(strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-1].str));
@@ -1500,11 +1518,11 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1504 "chesser.tab.c"
+#line 1522 "chesser.tab.c"
     break;
 
   case 12: /* mov: COORD CHECKMATE  */
-#line 145 "chesser.y"
+#line 163 "chesser.y"
                       {
         (yyval.str) = malloc(strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-1].str));
@@ -1512,11 +1530,11 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1516 "chesser.tab.c"
+#line 1534 "chesser.tab.c"
     break;
 
   case 13: /* mov: PIECE COORD CHECK  */
-#line 152 "chesser.y"
+#line 170 "chesser.y"
                         {
         (yyval.str) = malloc(strlen((yyvsp[-2].str)) + strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-2].str));
@@ -1526,11 +1544,11 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1530 "chesser.tab.c"
+#line 1548 "chesser.tab.c"
     break;
 
   case 14: /* mov: PIECE COORD CHECKMATE  */
-#line 161 "chesser.y"
+#line 179 "chesser.y"
                             {
         (yyval.str) = malloc(strlen((yyvsp[-2].str)) + strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-2].str));
@@ -1540,11 +1558,11 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1544 "chesser.tab.c"
+#line 1562 "chesser.tab.c"
     break;
 
   case 15: /* mov: COORD CAPTURE COORD CHECK  */
-#line 170 "chesser.y"
+#line 188 "chesser.y"
                                 {
         (yyval.str) = malloc(strlen((yyvsp[-3].str)) + strlen((yyvsp[-2].str)) + strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-3].str));
@@ -1556,11 +1574,11 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1560 "chesser.tab.c"
+#line 1578 "chesser.tab.c"
     break;
 
   case 16: /* mov: COORD CAPTURE COORD CHECKMATE  */
-#line 181 "chesser.y"
+#line 199 "chesser.y"
                                     {
         (yyval.str) = malloc(strlen((yyvsp[-3].str)) + strlen((yyvsp[-2].str)) + strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 1);
         strcpy((yyval.str), (yyvsp[-3].str));
@@ -1572,11 +1590,11 @@ yyreduce:
         free((yyvsp[-1].str));
         free((yyvsp[0].str));
     }
-#line 1576 "chesser.tab.c"
+#line 1594 "chesser.tab.c"
     break;
 
 
-#line 1580 "chesser.tab.c"
+#line 1598 "chesser.tab.c"
 
       default: break;
     }
@@ -1800,7 +1818,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 194 "chesser.y"
+#line 212 "chesser.y"
 
 
 int main(int argc, char **argv) {

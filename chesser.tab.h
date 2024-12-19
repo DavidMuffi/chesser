@@ -81,7 +81,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 58 "chesser.y"
+#line 76 "chesser.y"
 
     char *str;
 

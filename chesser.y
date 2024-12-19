@@ -8,16 +8,16 @@ extern int yyparse();
 extern FILE *yyin;
 extern int line;
 
-char *moves[10];
+char *moves[50];
 int num_movimientos = 0;
 
 typedef struct {
-    char nombre[50];
-    char *movimientos[10];
+    char nombre[100];
+    char *movimientos[20];
     int num_movimientos;
 } Apertura;
 
-Apertura aperturas[100];
+Apertura aperturas[200];
 int num_aperturas = 0;
 
 void cargar_aperturas(const char *filename) {
@@ -29,25 +29,43 @@ void cargar_aperturas(const char *filename) {
 
     char buffer[1024];
     while (fgets(buffer, sizeof(buffer), file)) {
+        // Eliminar el carácter de nueva línea si existe
+        char *newline = strchr(buffer, '\n');
+        if (newline) {
+            *newline = '\0';
+        }
+
+        // Dividir en movimientos y nombre
         char *movimientos = strtok(buffer, "=");
         char *nombre = strtok(NULL, "=");
 
         if (nombre && movimientos) {
+            // Eliminar espacios iniciales/finales del nombre
+            while (*nombre == ' ') nombre++; // Saltar espacios al inicio
+            char *end = nombre + strlen(nombre) - 1;
+            while (end > nombre && *end == ' ') end--; // Saltar espacios al final
+            *(end + 1) = '\0'; // Terminar la cadena
+
             // Limpiar y almacenar el nombre de la apertura
-            strcpy(aperturas[num_aperturas].nombre, nombre);
+            strncpy(aperturas[num_aperturas].nombre, nombre, sizeof(aperturas[num_aperturas].nombre) - 1);
+            aperturas[num_aperturas].nombre[sizeof(aperturas[num_aperturas].nombre) - 1] = '\0';
             aperturas[num_aperturas].num_movimientos = 0;
 
             // Dividir y almacenar los movimientos
             char *token = strtok(movimientos, " ");
-            while (token) {
-                aperturas[num_aperturas].movimientos[aperturas[num_aperturas].num_movimientos++] = strdup(token);
+            while (token && aperturas[num_aperturas].num_movimientos < 10) {
+                aperturas[num_aperturas].movimientos[aperturas[num_aperturas].num_movimientos] = strdup(token);
+                aperturas[num_aperturas].num_movimientos++;
                 token = strtok(NULL, " ");
             }
+
             num_aperturas++;
         }
     }
+
     fclose(file);
 }
+
 
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s en la línea %d\n", s, line);
