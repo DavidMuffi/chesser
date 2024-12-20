@@ -1,127 +1,119 @@
+import chess
 import tkinter as tk
-from PIL import Image, ImageTk  # Librería Pillow para redimensionar imágenes
+from PIL import Image, ImageTk
+import os
 import argparse
 
-def draw_board(canvas, board, images, title):
+# Diccionario con las imágenes de las piezas
+PIECES = {
+    'P': 'images/wP.png',
+    'N': 'images/wN.png',
+    'B': 'images/wB.png',
+    'R': 'images/wR.png',
+    'Q': 'images/wQ.png',
+    'K': 'images/wK.png',
+    'p': 'images/bP.png',
+    'n': 'images/bN.png',
+    'b': 'images/bB.png',
+    'r': 'images/bR.png',
+    'q': 'images/bQ.png',
+    'k': 'images/bK.png'
+}
+
+# Función para obtener la imagen de la pieza
+def get_piece_image(piece, square_size):
+    try:
+        image_path = PIECES[piece]
+        img = Image.open(image_path)
+        img = img.convert('RGBA')  # Asegurarse de que la imagen tenga transparencia
+        img = img.resize((square_size, square_size), Image.NEAREST)  # Redimensionado sin suavizado para pixel art
+        return ImageTk.PhotoImage(img)
+    except KeyError:
+        return None  # No hay pieza en esa casilla
+
+# Función para mostrar el tablero con las piezas y las coordenadas
+def create_chessboard_window(board, canvas, images):
+    # Colores de las casillas del tablero (madera clara y oscura)
+    colors = ['#FA8EC8', '#030b1e']
+    square_size = 60  # Tamaño de cada casilla
+
+    # Limpiar el canvas
     canvas.delete("all")
-    size = 120  # Tamaño de cada celda
-    colors = ["#000000", "#fa8ec8"]  # Colores del tablero
-    
-    # Dibujar el título
-    canvas.create_text(size * 4, 10, text=title, font=("Arial", 20, "bold"))
-    
-    # Dibujar el tablero
+    images.clear()  # Limpiar las imágenes anteriores
+
+    # Dibujar las coordenadas
+    for i in range(8):
+        # Coordenadas de las filas (1-8)
+        canvas.create_text(10, i * square_size + square_size // 2 - 5, text=str(8 - i), fill="black")
+        canvas.create_text(8 * square_size + 20, i * square_size + square_size // 2 - 5, text=str(8 - i), fill="black")
+        # Coordenadas de las columnas (a-h)
+        canvas.create_text(i * square_size + square_size // 2, 8 * square_size + 5, text=chr(ord('a') + i), fill="black")
+        canvas.create_text(i * square_size + square_size // 2, 5, text=chr(ord('a') + i), fill="black")
+
+    # Dibujar el tablero y las piezas
     for row in range(8):
         for col in range(8):
+            x1 = col * square_size
+            y1 = row * square_size
+            x2 = x1 + square_size
+            y2 = y1 + square_size
             color = colors[(row + col) % 2]
-            x1, y1 = col * size, row * size + 40  # Desplazar el tablero hacia abajo para que no se superponga
-            x2, y2 = x1 + size, y1 + size
-            canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline=color)
+            canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
 
-    # Dibujar las piezas
-    for row in range(8):
-        for col in range(8):
-            piece = board[row][col]
+            # Obtener la pieza en la casilla y mostrarla
+            piece = board.piece_at(chess.square(col, 7 - row))  # Ajuste para la fila 0 en la parte inferior
             if piece:
-                x, y = col * size, row * size + 40
-                canvas.create_image(x + size // 2, y + size // 2, image=images[piece])
-    
-    # Dibujar las coordenadas (columnas y filas)
-    for i in range(8):
-        # Dibujar columnas (a-h) en la parte superior e inferior
-        canvas.create_text(i * size + size // 2, size * 8 + 30, text=chr(i + 97), font=("Arial", 16))
-        canvas.create_text(i * size + size // 2, -10 + 40, text=chr(i + 97), font=("Arial", 16))
-        # Dibujar filas (1-8) a la izquierda y derecha
-        canvas.create_text(-10, i * size + size // 2 + 40, text=str(8 - i), font=("Arial", 16))
-        canvas.create_text(size * 8 + 10, i * size + size // 2 + 40, text=str(8 - i), font=("Arial", 16))
+                img = get_piece_image(piece.symbol(), square_size)
+                if img:
+                    images.append(img)  # Mantener referencia
+                    canvas.create_image(x1 + square_size // 2, y1 + square_size // 2, image=img)
 
-def initialize_board():
-    """Crea el tablero inicial de ajedrez."""
-    board = [[None for _ in range(8)] for _ in range(8)]
-    
-    # Inicializar peones
-    for i in range(8):
-        board[1][i] = "white_pawn"  # Peones blancos
-        board[6][i] = "black_pawn"  # Peones negros
-    
-    # Inicializar piezas mayores
-    initial_row = [
-        "white_rook", "white_knight", "white_bishop", "white_queen",
-        "white_king", "white_bishop", "white_knight", "white_rook"
-    ]
-    board[0] = initial_row
-    board[7] = [piece.replace("white", "black") for piece in initial_row]
-    
-    return board
+# Función para procesar los movimientos en notación SAN
+def process_moves(board, moves, canvas, images, root):
+    for move in moves:
+        board.push_san(move)  # Realizar el movimiento
+        create_chessboard_window(board, canvas, images)  # Redibujar el tablero
+        root.after(500, root.update())
 
-def move_piece(board, move):
-    """Aplica un movimiento básico (simplificado)."""
-    start, end = move.split()
-    start_col, start_row = ord(start[0]) - ord('a'), 8 - int(start[1])
-    end_col, end_row = ord(end[0]) - ord('a'), 8 - int(end[1])
-    
-    board[end_row][end_col] = board[start_row][start_col]
-    board[start_row][start_col] = None
+# Función principal para iniciar la simulación
+def chess_simulation(fen, moves, title):
+    # Inicializar el tablero de ajedrez con la posición FEN
+    board = chess.Board(fen)
 
-def load_images():
-    """Carga las imágenes de las piezas y las redimensiona manteniendo el pixel art."""
-    images = {}
-    piece_files = {
-        "white_king": "white_king.png",
-        "white_queen": "white_queen.png",
-        "white_rook": "white_rook.png",
-        "white_bishop": "white_bishop.png",
-        "white_knight": "white_knight.png",
-        "white_pawn": "white_pawn.png",
-        "black_king": "black_king.png",
-        "black_queen": "black_queen.png",
-        "black_rook": "black_rook.png",
-        "black_bishop": "black_bishop.png",
-        "black_knight": "black_knight.png",
-        "black_pawn": "black_pawn.png",
-    }
-    
-    for piece, file in piece_files.items():
-        # Cargar la imagen original
-        original_image = Image.open(file)
-        # Redimensionar conservando pixel art
-        resized_image = original_image.resize((70, 70), Image.Resampling.NEAREST)
-        # Convertir a un formato compatible con tkinter
-        images[piece] = ImageTk.PhotoImage(resized_image)
-    
-    return images
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Juego de Ajedrez paso a paso.")
-    parser.add_argument("title", type=str, help="Título para mostrar en el tablero de ajedrez")
-    args = parser.parse_args()
-    
-    moves = ["e2 e4", "e7 e5", "g1 f3", "b8 c6", "d2 d4"]  # Movimientos de ejemplo
-    
-    # Crear la ventana y el lienzo
     root = tk.Tk()
-    root.title("Visualizamos la Apertura paso a paso")  # Establecer el título de la ventana con el parámetro
-    size = 125 * 8
-    canvas = tk.Canvas(root, width=size, height=size)
+    root.title(title)  # Usar el título pasado como argumento
+
+    canvas = tk.Canvas(root, width=8 * 60 + 40, height=8 * 60 + 60)  # Ajustar tamaño del canvas para incluir coordenadas y título
     canvas.pack()
-    
-    # Cargar imágenes
-    images = load_images()
-    
-    # Inicializar el tablero
-    board = initialize_board()
-    draw_board(canvas, board, images, title=args.title)  # Pasar el título desde la entrada
-    
-    # Mostrar movimientos paso a paso
-    def show_moves(index=0):
-        if index < len(moves):
-            move_piece(board, moves[index])
-            draw_board(canvas, board, images, title=args.title)  # Actualizar con el título
-            root.after(1000, show_moves, index + 1)  # Esperar 1 segundo antes del siguiente movimiento
-    
-    root.after(1000, show_moves)  # Iniciar después de 1 segundo
+
+    # Mostrar el título encima del tablero
+    canvas.create_text(8 * 60 // 2 + 20, 20, text=title, font=("Arial", 16), fill="black")
+
+    images = []  # Para almacenar las referencias de las imágenes y evitar la recolección de basura
+
+    # Mostrar el tablero inicial
+    create_chessboard_window(board, canvas, images)
+
+    # Procesar los movimientos y animarlos
+    process_moves(board, moves, canvas, images, root)
+
     root.mainloop()
 
-if __name__ == "__main__":
-    main()
+# Configurar argparse para manejar los argumentos de línea de comandos
+parser = argparse.ArgumentParser(description="Simulación de ajedrez con tablero gráfico.")
+parser.add_argument("title", type=str, help="Título a mostrar encima del tablero.")
+args = parser.parse_args()
+
+# Secuencia de movimientos en notación SAN (puedes reemplazar esto con tus propios movimientos)
+# Obtener la ruta del archivo de ejemplo
+file_path = os.path.join(os.path.dirname(__file__), 'ejemplo.txt')
+
+# Leer los movimientos desde el archivo
+with open(file_path, 'r') as file:
+    moves = file.read().split()
+
+# Posición inicial FEN
+fen_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"  # FEN del tablero de inicio
+
+# Ejecutar la simulación con la posición inicial FEN, los movimientos y el título
+chess_simulation(fen_position, moves, args.title)
