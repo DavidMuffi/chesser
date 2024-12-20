@@ -1,0 +1,12 @@
+El proyecto presentado se trata de un analizador de partidas de ajedrez (completas o no)
+en el que se detecta la apertura utizada y se presenta su nombre junto con una representación
+gráfica usando un script python.
+Requisitos adicionales:
+En el fichero de entrada solo puede haber una única partida en notación internacional en una
+única línea.
+Para ejecutar el script python son necesarios 3 paquetes:
+-Tkinter: sudo apt-get install python3-tk
+-Pillow: pip install Pillow
+-Chess: pip install chess
+Se presentan varios archivos de prueba para determinar el correcto funcionamiento del proyecto
+además de su tolerancia a errores

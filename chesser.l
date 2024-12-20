@@ -53,7 +53,7 @@ CHECKMATE     [#]
 {NEW_LINE} { ++line; }
 [ \t]+ {}
 . { 
-    fprintf(stderr, "Notación incorrecta: '%s' en la línea %d\n", yytext, line); return ERROR;
+    fprintf(stderr, "Notación incorrecta: '%s' en la línea %d\n", yytext, line);
 }
 
 %%
