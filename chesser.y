@@ -88,7 +88,7 @@ void yyerror(const char *s) {
     char *str;
 }
 
-%token <str> PIECE COORD1 COORD2 CAPTURE CASTLE_SHORT CASTLE_LONG CHECK CHECKMATE ERROR
+%token <str> PIECE COORD1 COORD2 CAPTURE CASTLE_SHORT CASTLE_LONG CHECK CHECKMATE
 %type <str> movs mov
 %start S
 %%
@@ -121,7 +121,7 @@ input:
         }
 
         if (apertura_reconocida) {
-            printf("Apertura reconocida: %s.\n", apertura_reconocida);
+            printf(" Apertura reconocida: %s.\n", apertura_reconocida);
 
             char command[256];
             sprintf(command, "python3 chesser.py \"%s\"", apertura_reconocida);
@@ -130,12 +130,12 @@ input:
             if (result == 0) {
                 printf("El script Python se ejecutó con éxito.\n");
             } else {
-                printf("Error al ejecutar el script Python.\n");
+                yyerror("Error al ejecutar el script Python.");
             }
         } else if(!validar_movimientos(moves, num_movimientos)) {
-            printf("Apertura ilegal. Un jugador no puede enrocar varias veces por partida.\n");
+            yyerror("Apertura ilegal. Un jugador no puede enrocar varias veces por partida.\n");
         } else {
-            printf("Apertura no reconocida.\n");
+            yyerror("Apertura no reconocida.");
         }
     }
     ;
@@ -145,6 +145,10 @@ movs:
     }
     | movs mov {
         moves[num_movimientos++] = $2; // Agrega más movimientos al array
+    }
+    |
+    {
+        yyerror("No se detectaron movimientos.");
     }
     ;
 
@@ -342,6 +346,9 @@ mov:
         free($2); 
         free($3); 
         free($4);
+    }
+    |{
+        yyerror("Movimiento incorrecto.");
     }
 ;
 
