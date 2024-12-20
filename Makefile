@@ -12,8 +12,5 @@ compile:
 clean:
 	rm $(FUENTE) lex.yy.c $(FUENTE).tab.c $(FUENTE).tab.h
 
-run1:
-	./$(FUENTE) < $(PRUEBA1)
-
-run2:
-	./$(FUENTE) < $(PRUEBA2)
+run1: compile
+	./chesser < ejemplo.txt
